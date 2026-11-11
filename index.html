@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Belajar: Cerita Rakyat Kelas 6</title>
+    <style>
+        :root {
+            --bg-color: #f0f8ff;
+            --card-front: #ffffff;
+            --card-back: #fffde7;
+            --primary: #4a90e2;
+            --primary-hover: #357abd;
+            --success: #4caf50;
+            --success-hover: #388e3c;
+            --warning: #ff9800;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+        }
+
+        .stat-value.understood { color: var(--success); }
+        .stat-value.remaining { color: var(--warning); }
+
+        .card-container {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            border: 4px solid;
+        }
+
+        .card-front {
+            background-color: var(--card-front);
+            border-color: #81d4fa;
+        }
+
+        .card-back {
+            background-color: var(--card-back);
+            border-color: #ffe082;
+            transform: rotateY(180deg);
+        }
+
+        .card-type {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-status-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            display: none;
+        }
+
+        .understood-true .card-status-icon {
+            display: block;
+            color: var(--success);
+        }
+
+        .card-content {
+            font-size: 1.4rem;
+            line-height: 1.5;
+        }
+
+        .card-back .card-content {
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-nav {
+            background-color: var(--primary);
+            color: white;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-nav:hover { background-color: var(--primary-hover); }
+        .btn-nav:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .btn-mark {
+            background-color: var(--success);
+            color: white;
+            width: 100%;
+        }
+        .btn-mark.marked { background-color: #f44336; }
+        
+        .btn-shuffle {
+            background-color: var(--warning);
+            color: white;
+            width: 100%;
+        }
+
+        .nav-selector {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        select {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        @media (max-width: 480px) {
+            .card-content { font-size: 1.1rem; }
+            .card-back .card-content { font-size: 1.1rem; }
+            h1 { font-size: 1.5rem; }
+            .card-container { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📚 Kartu Pintar Cerita Rakyat</h1>
+        <p>Ketuk kartu untuk melihat jawaban!</p>
+    </header>
+
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-label">Total Kartu</span>
+            <span class="stat-value" id="total-cards">20</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Sudah Dipahami</span>
+            <span class="stat-value understood" id="understood-cards">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Belum Dipahami</span>
+            <span class="stat-value remaining" id="remaining-cards">20</span>
+        </div>
+    </div>
+
+    <div class="nav-selector">
+        <label for="card-select">Pilih Kartu:</label>
+        <select id="card-select" onchange="jumpToCard()"></select>
+    </div>
+    <br>
+
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <div class="card-face card-front">
+                <div class="card-type">Pertanyaan</div>
+                <div class="card-status-icon">✅</div>
+                <div class="card-content" id="card-front-text"></div>
+            </div>
+            <div class="card-face card-back">
+                <div class="card-type">Jawaban</div>
+                <div class="card-status-icon">✅</div>
+                <div class="card-content" id="card-back-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-nav" id="btn-prev" onclick="prevCard()">⬅️ Sebelumnya</button>
+        <button class="btn-nav" id="btn-next" onclick="nextCard()">Berikutnya ➡️</button>
+        <button class="btn-mark" id="btn-mark" onclick="toggleUnderstood()">✅ Tandai Sudah Dipahami</button>
+        <button class="btn-shuffle" onclick="shuffleCards()">🔀 Acak Kartu</button>
+    </div>
+
+    <script>
+        const originalCardsData = [
+            { f: "Cerita yang berasal dari masyarakat pada masa lalu dan berkembang secara lisan disebut...", b: "Cerita Rakyat (Folklore)." },
+            { f: "Jenis cerita rakyat yang tokoh utamanya adalah hewan bertingkah laku seperti manusia disebut...", b: "Fabel. Contoh: Kancil dan Buaya." },
+            { f: "Cerita rakyat yang menceritakan asal-usul terjadinya suatu tempat disebut...", b: "Legenda. Contoh: Legenda Danau Toba." },
+            { f: "Cerita rakyat yang dianggap suci dan melibatkan dewa-dewi atau makhluk gaib disebut...", b: "Mite (Mitos). Contoh: Nyi Roro Kidul." },
+            { f: "Cerita rakyat yang berisi kisah kepahlawanan atau keberanian seseorang disebut...", b: "Sage. Contoh: Ciung Wanara." },
+            { f: "Apa fungsi gambar atau ilustrasi pada teks sastra bergambar?", b: "Untuk membantu pembaca membayangkan suasana, tokoh, dan jalan cerita agar lebih menarik." },
+            { f: "Rangkaian gambar yang berisi cerita berurutan dilengkapi balon kata untuk dialog disebut...", b: "Komik." },
+            { f: "Pesan moral atau nasihat yang ingin disampaikan pengarang melalui cerita disebut...", b: "Amanat." },
+            { f: "Nilai yang berkaitan dengan sikap baik dan buruk (akhlak) perilaku tokoh cerita disebut...", b: "Nilai Moral." },
+            { f: "Nilai yang berkaitan dengan tradisi atau adat kebiasaan masyarakat dalam cerita disebut...", b: "Nilai Budaya." },
+            { f: "Tokoh dalam cerita yang memiliki peran atau sifat baik disebut...", b: "Tokoh Protagonis." },
+            { f: "Tokoh dalam cerita yang memiliki sifat jahat atau menentang tokoh utama disebut...", b: "Tokoh Antagonis." },
+            { f: "Makna kata yang sebenarnya, asli, atau sesuai dengan kamus disebut...", b: "Makna Denotatif." },
+            { f: "Makna kata yang bukan sebenarnya (mengandung kiasan, perumpamaan, atau perasaan) disebut...", b: "Makna Konotatif." },
+            { f: "Kata 'Bunga desa' memiliki makna...", b: "Konotatif, yang artinya gadis paling cantik atau pujaan di desa tersebut." },
+            { f: "Kata 'Tangan kanan' dalam kalimat 'Ia adalah tangan kanan bosnya' memiliki makna...", b: "Konotatif, yang artinya orang kepercayaan." },
+            { f: "'Budi memetik bunga di taman.' Kata bunga pada kalimat tersebut bermakna...", b: "Denotatif, yaitu bagian tumbuhan yang akan menjadi buah." },
+            { f: "Latar (setting) dalam sebuah cerita meliputi tiga hal utama, yaitu...", b: "Latar tempat, latar waktu, dan latar suasana." },
+            { f: "Jalan cerita atau rangkaian peristiwa dari awal sampai akhir dalam cerita disebut...", b: "Alur (Plot)." },
+            { f: "Kalimat pembuka cerita rakyat biasanya menggunakan kata-kata khusus seperti...", b: "Pada zaman dahulu, syahdan, alkisah, atau konon kabarnya." }
+        ];
+
+        let cards = originalCardsData.map((card, index) => ({
+            ...card,
+            id: index + 1,
+            understood: false
+        }));
+
+        let currentIndex = 0;
+
+        const cardElement = document.getElementById('flashcard');
+        const frontText = document.getElementById('card-front-text');
+        const backText = document.getElementById('card-back-text');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnMark = document.getElementById('btn-mark');
+        const cardSelect = document.getElementById('card-select');
+
+        function init() {
+            updateSelectOptions();
+            renderCard();
+            updateStats();
+        }
+
+        function renderCard() {
+            // Reset flip state
+            cardElement.classList.remove('flipped');
+            
+            setTimeout(() => {
+                const currentCard = cards[currentIndex];
+                frontText.innerHTML = currentCard.f;
+                backText.innerHTML = currentCard.b;
+                
+                // Update status UI
+                if (currentCard.understood) {
+                    cardElement.classList.add('understood-true');
+                    btnMark.innerHTML = "❌ Batal Tandai";
+                    btnMark.classList.add('marked');
+                } else {
+                    cardElement.classList.remove('understood-true');
+                    btnMark.innerHTML = "✅ Tandai Sudah Dipahami";
+                    btnMark.classList.remove('marked');
+                }
+
+                // Update buttons state
+                btnPrev.disabled = currentIndex === 0;
+                btnNext.disabled = currentIndex === cards.length - 1;
+                
+                // Sync select dropdown
+                cardSelect.value = currentIndex;
+            }, 150); // wait for unflip animation
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                renderCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            }
+        }
+
+        function jumpToCard() {
+            currentIndex = parseInt(cardSelect.value);
+            renderCard();
+        }
+
+        function toggleUnderstood() {
+            cards[currentIndex].understood = !cards[currentIndex].understood;
+            renderCard();
+            updateStats();
+        }
+
+        function updateStats() {
+            const understoodCount = cards.filter(c => c.understood).length;
+            document.getElementById('understood-cards').innerText = understoodCount;
+            document.getElementById('remaining-cards').innerText = cards.length - understoodCount;
+        }
+
+        function updateSelectOptions() {
+            cardSelect.innerHTML = '';
+            cards.forEach((card, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                // Highlight if understood in dropdown
+                const status = card.understood ? " (✅)" : "";
+                option.text = `Kartu ${index + 1}: ${card.f.substring(0, 30)}...${status}`;
+                cardSelect.appendChild(option);
+            });
+        }
+
+        function shuffleCards() {
+            // Fisher-Yates shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            updateSelectOptions();
+            renderCard();
+            updateStats();
+        }
+
+        // Initialize App
+        init();
+    </script>
+</body>
+</html>
